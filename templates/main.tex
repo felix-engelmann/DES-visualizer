@@ -1,0 +1,70 @@
+\documentclass[paper=a4,fontsize=11pt,pagesize,bibtotoc]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage[osf]{mathpazo}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{automata}
+\usepackage{amsthm, amssymb, amsmath}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{hyperref}
+
+\usepackage{pgfplots}
+\usepackage{listings}
+
+\usepackage{subcaption}
+
+\usepackage{pgfplots}
+\begin{document}
+(% for r in rounds %)
+	\newpage
+	\section*{Round (( loop.index ))}
+
+		\centering
+			\begin{tikzpicture}[scale=0.7]
+				\node[rectangle,draw] (R) at (0,3) {$R_{(( loop.index-1 ))} [32]$};
+				\node[right] (Rd) at (1,3) {\small \texttt{(( r.before_R|binify ))}};
+				\node[rectangle,draw] (L) at (-4,3) {$L_{(( loop.index-1 ))} [32]$};
+
+				\node[rectangle,draw] (Rn) at (0,-14) {$R_{(( loop.index ))} [32]$};
+				\node[right] (Rnd) at (1,-14) {\small \texttt{(( r.after_R|binify ))}};
+				\node[rectangle,draw] (Ln) at (-4,-14) {$L_{(( loop.index ))} [32]$};
+
+				\node[circle,draw] (E) at (0,0) {E};
+				\node[rectangle,draw] (RE) at (0,-2) {$E(R_{(( loop.index-1 ))}) [48]$};
+				\node[right] (REd) at (1.5,-2) {\small \texttt{(( r.expanded|binify ))}};
+				\node[circle,draw] (xor) at(0,-4) {+};
+				\node[rectangle,draw] (K) at (2,-4) {$K_{(( loop.index ))} [48]$};
+				\node[right] (Kd) at (3,-4) {\small \texttt{(( r.subkey|binify ))}};
+				\node[circle, draw] (P) at (0,-10) {P};
+				\node[circle,draw] (plus) at(0,-12) {+};
+
+
+				\draw[->] (R) -- (E);
+				\draw[->] (E) -- (RE);
+				\draw[->] (RE) -- (xor);
+				\draw[->] (K) -- (xor);
+				\draw[->] (P) -- node[right] {\small \texttt{(( r.after_P|binify ))}} (plus);
+				\draw[->] (L) |- (plus);
+				\draw[->] (plus) -- (Rn);
+				\draw[->] (0,1) -| (-3,-13) -| (Ln);
+
+				\node[right,fill=white] (Ld) at (-3.5,2) {\small \texttt{(( r.before_L|binify ))}};
+				\node[right,fill=white] (Lnd) at (-3.5,-15) {\small \texttt{(( r.after_L|binify ))}};
+
+				(% for b in r.before_sbox %)
+				{
+					\node (SI(( loop.index ))) at (2*(( loop.index ))-3,-6){(( b|binify ))};
+					\node[rectangle, draw, rounded corners] at (2*(( loop.index ))-3,-7){$S_{(( loop.index ))}$};
+					\node (SO(( loop.index ))) at (2*(( loop.index ))-3,-8){(( r.after_sbox[loop.index-1]|binify ))};
+					\draw[->] (xor) --  (0,-5) -| (SI(( loop.index )));
+					\draw[->] (SO(( loop.index ))) |- (0,-9) -- (P);
+				}
+				(% endfor %)
+			\end{tikzpicture}
+(% endfor %)
+\end{document}
